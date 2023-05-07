@@ -1,12 +1,13 @@
 import { NextFunction, Request, Response, Router } from 'express';
 import { LoggerService } from '../logger/logger.service';
+import { injectable } from 'inversify';
 
 export interface BaseRoute {
 	path: string;
 	func: (req: Request, res: Response, next: NextFunction) => void;
 	method: keyof Pick<Router, 'get' | 'post' | 'patch' | 'put' | 'delete'>;
 }
-
+@injectable()
 export abstract class BaseConroller {
 	private readonly _router: Router;
 
