@@ -15,24 +15,24 @@ export abstract class BaseConroller {
 		this._router = Router();
 	}
 
-	get router() {
+	get router(): Router {
 		return this._router;
 	}
 
-	public send<T>(res: Response, code: number, message: T) {
+	public send<T>(res: Response, code: number, message: T): Response<T, Record<string, unknown>> {
 		res.type('application/json');
 		return res.status(code).json(message);
 	}
 
-	public ok<T>(res: Response, message: T) {
+	public ok<T>(res: Response, message: T): Response<T, Record<string, unknown>> {
 		return this.send<T>(res, 200, message);
 	}
 
-	public created(res: Response) {
+	public created(res: Response): Response<unknown, Record<string, unknown>> {
 		return res.sendStatus(2001);
 	}
 
-	protected bindRouter(routes: BaseRoute[]) {
+	protected bindRouter(routes: BaseRoute[]): void {
 		for (const route of routes) {
 			this.logger.log(`[${route.method}] ${route.path}`);
 			const handler = route.func.bind(this);
