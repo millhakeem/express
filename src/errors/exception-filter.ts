@@ -10,7 +10,7 @@ export interface IExceptionFilter {
 
 @injectable()
 export class ExceptionFilter implements IExceptionFilter {
-	constructor(@inject(TYPES.ILogger) private logger: LoggerService) {}
+	constructor(@inject(TYPES.Logger) private logger: LoggerService) {}
 
 	catch(err: Error | HTTPError, req: Request, res: Response, next: NextFunction): void {
 		if (err instanceof HTTPError) {
