@@ -7,7 +7,7 @@ export interface ILogger {
 	warn: (...args: unknown[]) => void;
 }
 @injectable()
-export class LoggerService {
+export class LoggerService implements ILogger {
 	public logger: Logger;
 
 	constructor() {

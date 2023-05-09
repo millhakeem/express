@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response, Router } from 'express';
-import { LoggerService } from '../logger/logger.service';
 import { injectable } from 'inversify';
+import { ILogger } from '../logger/logger.service';
 import { IMiddleware } from './middleware.interface';
 
 export interface BaseRoute {
@@ -13,7 +13,7 @@ export interface BaseRoute {
 export abstract class BaseConroller {
 	private readonly _router: Router;
 
-	constructor(private logger: LoggerService) {
+	constructor(private logger: ILogger) {
 		this._router = Router();
 	}
 
