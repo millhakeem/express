@@ -8,6 +8,7 @@ import { IExceptionFilter } from './errors/exception-filter';
 import { ILogger } from './logger/logger.service';
 import { TYPES } from './types';
 import { UserController } from './user/user.controller';
+import { AuthMiddleware } from './common/auth.middleware';
 
 @injectable()
 export class App {
@@ -28,6 +29,8 @@ export class App {
 
 	useMiddleware(): void {
 		this.app.use(json());
+		const authMiddleware = new AuthMiddleware(this.configService.getConfig('SECRET'));
+		this.app.use(authMiddleware.execute.bind(authMiddleware));
 	}
 
 	useRoutes(): void {
