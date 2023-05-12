@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { inject, injectable } from 'inversify';
 import { sign } from 'jsonwebtoken';
+import { AuthGuard } from '../common/auth.guard';
 import { BaseConroller } from '../common/base.controller';
 import { ValidateMiddleware } from '../common/validate.middleware';
 import { IConfigService } from '../config/config-service.interface';
@@ -41,7 +42,7 @@ export class UserController extends BaseConroller implements IUserController {
 				path: '/info',
 				method: 'get',
 				func: this.info,
-				middlewares: [],
+				middlewares: [new AuthGuard()],
 			},
 		]);
 	}
@@ -61,7 +62,8 @@ export class UserController extends BaseConroller implements IUserController {
 	}
 
 	async info({ user }: Request, res: Response, next: NextFunction): Promise<void> {
-		this.ok(res, { email: user });
+		const userInfo = await this.userService.getUserInfo(user);
+		this.ok(res, { email: userInfo?.email, id: userInfo?.id });
 	}
 
 	async register(
@@ -76,16 +78,24 @@ export class UserController extends BaseConroller implements IUserController {
 		this.ok(res, { email: result.email, id: result.id });
 	}
 
-	private signJWT(payload: string, secret: string): string {
-		return sign(
-			{ email: payload, iat: Math.floor(Date.now() / 1000) },
-			secret,
-			{
-				algorithm: 'HS256',
-			},
-			// (err, token) => {
-			// 	err ? reject(err) : resolveComponent(token);
-			// },
-		);
+	private signJWT(payload: string, secret: string): Promise<string> {
+		return new Promise<string>((resolve, reject) => {
+			sign(
+				{
+					email: payload,
+					iat: Math.floor(Date.now() / 1000),
+				},
+				secret,
+				{
+					algorithm: 'HS256',
+				},
+				(err, token) => {
+					if (err) {
+						reject(err);
+					}
+					resolve(token as string);
+				},
+			);
+		});
 	}
 }
